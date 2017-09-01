@@ -14,13 +14,47 @@
 
 import webapp2
 
+form="""
+<form method='post'>
+	Enter some text<br>
+		<textarea value='%(text)s' name='text' rows='10' cols='50'>
+		</textarea><br>
+	<input type='submit'>
+</form>
+"""
 
+def rot(s):
+  alpha = ' abcdefghijklmnopqrstuvwxz'
+  alpha = list(alpha)
+  #s = s.lower()
+  b = []
+  
+  for i in range(len(s)):
+    index_in_alpha = alpha.index(s[i].lower())
+    new_index = (index_in_alpha + 13) % 26
+    new_value = alpha[new_index]
+    b.append(new_value)
+    
+  for i in range(len(s)):
+    l = list(s)
+    if l[i] == l[i].upper():
+      b[i] == b[i].upper()
+    s = ''.join(b)
+
+  return s
+  
 class MainPage(webapp2.RequestHandler):
-    def get(self):
-        self.response.headers['Content-Type'] = 'text/plain'
-        self.response.write('Hello, World!')
 
+	def write_form(self, text=''):
+		self.response.out.write(form % {'text': text})
+
+	def get(self):
+        	self.write_form()
+
+	def post(self):
+		text = self.request.get('text')
+		text = rot(text)
+		self.write_form(text)
 
 app = webapp2.WSGIApplication([
-    ('/', MainPage),
-], debug=True)
+    ('/', MainPage)], debug=True)
