@@ -1,30 +1,21 @@
-<!DOCTYPE html>
-<html>
-<head>
-	<title>New Blog Post</title>
-</head>
-<body>
-	<form method='post'>
-	<h1>Enter a new post</h1><br>
-		Subject<br>
-		<input type="text" name='subject' value="{{subject}}"><br><br>
-		Blog post<br>
-		<textarea name='blog' rows='50' cols='10'>{{blog}}</textarea><br><br>
-		<div class='error'>{{error}}</div><br>
-		<input type="submit">
-	</form>
-	<style type="text/css">
-		body {
-			font-family: Times;
+{% extends "base.html" %}
 
-		}
-		error {
-			color: red;
-		}
+{% block content %}
+  <h2>new post</h2>
 
+    <form method="post">
+      <label>
+        <div>subject</div>
+        <input type="text" name="subject" value="{{subject}}">
+      </label>
 
+      <label>
+        <div>blog</div>
+        <textarea name="blog">{{blog}}</textarea>
+      </label>
 
+      <div class="error">{{error}}</div>
 
-	</style>
-</body>
-</html>
+      <input type="submit">
+    </form>
+{% endblock %}

@@ -1,17 +1,10 @@
-<!DOCTYPE html>
-<html>
-<head>
-	<title>Blog entries</title>
-</head>
-<body>
-	<div class="blogs">
-		{{post_list}}
-	</div>
-	<style type="text/css">
-		blogs {
-			font-family: Times;
-			
-		}
-	</style>
-</body>
-</html>
+{% extends "base.html" %}
+
+{% block content %}
+
+  {% for p in posts %}
+    {{ p.render() | safe }}
+    <br><br>
+  {% endfor %}
+
+{% endblock %}

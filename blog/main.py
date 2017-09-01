@@ -12,9 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import webapp2
 import os
+import re
+from string import letters
+
+import webapp2
 import jinja2
+
 from google.appengine.ext import db
 
 template_dir = os.path.join(os.path.dirname(_file_), 'templates')
@@ -33,35 +37,46 @@ class Handler(webapp2.RequestHandler):
 		self.write(self.render_str(template, **kw))
 
 class Blog(db.Model):
-	subject = db.StringProperty(required = True)
-	blog = db.TextProperty(required = True)
-	post_date = db.DateTimeProperty(auto_now_add = True)
-
-
-c = db.execute("SELECT * FROM Blog ORDER BY post_date")
-post_list = Blog(*c.fetchmany())
-
+  subject = db.StringProperty(required = True)
+  blog = db.TextProperty(required = True)
+  created = db.DateTimeProperty(auto_now_add = True)
+  last_modified = db.DateTimeProperty(auto_now = True)
 
 class MainPage(Handler):
-	def render_front(self, subject = '', blog = '', error = ''):
-		self.render('front.html', subject = subject, blog = blog, error = error)
+  def get(self):
+    posts = db.GqlQuery("SELECT * FROM Blog ORDER BY post_date LIMIT 10")
+    self.render('front.html', posts = posts)
 
-    def get(self):
-    	self.render_front
-
-class NewPostPage(Handler):
-	def render_front(self, subject = '', blog = '', error = ''):
+class NewPost(Handler):
+	def render_newpost(self, subject = '', blog = '', error = ''):
 		self.render('newpost.html', subject = subject, blog = blog, error = error)
 
-    def post(self):
+	def post(self):
     	subject = self.request.get('subject')
     	blog = self.request.get('blog')
-    	a = Blog(subject = subject, blog = blog)
-    	a.put()
-    	blog_id = obj.key().id()
-    	self.redirect('/blog/blog_id')
+        
+        if not (subject and blog):
+          error = 'You must enter a valid subject and blog'
+          self.render_newpost(subject = subject, blog = blog, error = error)
+          
+        else:
+          p = Blog(subject = subject, blog = blog)
+          p.put()
+          post_id = p.key().id()
+          self.redirect('/blog/%s' % str(post_id))
 
+class PostPage(Handler):
+  def get(self, post_id):
+    key = db.Key.from_path('Blog', int(post_id))
+    post = db.get(key)
+    if post:
+      self.render('permalink.html', post = post)
+    else:
+      self.error(404)
+      return
 
 app = webapp2.WSGIApplication([
-    ('/blog', MainPage), ('/blog/newpost', NewPostPage)
+    ('/blog/?', MainPage),
+  	('/blog/newpost', NewPost),
+  	('/blog/([0-9]+)', PostPage),
 ], debug=True)
