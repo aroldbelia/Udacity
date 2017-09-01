@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Blog</title>
+</head>
+<body>
+	<form method = 'post'>
+	<h1>New post</h1><br>
+		Subject<br>
+		<input type="text" name = 'subject' value="{{subject}}"><br><br>
+		Blog post<br>
+		<textarea rows = '50' cols = '10'>{{blog}}</textarea><br><br>
+		<div class = 'error'>{{error}}</div><br>
+		<input type="submit">
+	</form>
+	<style type="text/css">
+		body {
+			font-family: Times;
+
+		}
+		error {
+			color: red;
+		}
+
+
+
+
+	</style>
+</body>
+</html>
